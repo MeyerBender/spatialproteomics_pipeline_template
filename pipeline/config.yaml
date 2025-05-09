@@ -1,0 +1,5 @@
+paths:
+    image_path: "../../data/image.qptiff"
+    marker_path: "../../data/MarkerList.txt"
+    tma_annotation_path: "../../data/tma_annotations.txt"
+    result_path: "../../data/results"

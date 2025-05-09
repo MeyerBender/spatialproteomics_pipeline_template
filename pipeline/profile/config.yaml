@@ -1,0 +1,13 @@
+__use_yte__: true
+slurm: true
+jobs: 8
+latency-wait: 60
+use-conda: true
+default-resources:
+    slurm_account: huber
+    slurm_partition: htc-el8
+    runtime: 60
+set-resources:
+    cellpose:
+        slurm_partition: gpu-el8
+        mem_mb: 32000

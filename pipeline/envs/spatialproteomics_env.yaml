@@ -1,0 +1,14 @@
+name: spatialproteomics_env
+channels:
+  - conda-forge
+  - nvidia
+dependencies:
+  - python=3.12
+  - jupyter
+  - pip
+  - tifffile
+  - numpy
+  - pandas
+  - yaml
+  - pip:
+    - spatialproteomics[cellpose]==0.7.1

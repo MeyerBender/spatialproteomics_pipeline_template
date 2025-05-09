@@ -1,0 +1,43 @@
+configfile: "config.yaml"
+
+tma_image_path = config["paths"]["tma_image_path"]   # where the big TMA image is stored
+marker_path = config["paths"]["marker_path"]   # where the marker list is stored
+tma_annotation_path = config["paths"]["tma_annotation_path"]   # where the annotations from QuPath are stored
+result_path = config["paths"]["result_path"]   # where all intermediate files and results will be stored
+
+
+# === DEFINE SAMPLE NAMES ===
+# we need to define the sample names to tell snakemake which samples to process
+# these can simply be read from the TMA annotations which we previously created with QuPath
+import pandas as pd
+annotation_df = pd.read_csv(tma_annotation_path)
+sample_names = annotation_df["Name"].unique().tolist()
+
+rule all:
+    input:
+        expand(zarr_path + "/{sample}.zarr", sample=sample_names)
+
+rule crop_tma:
+    input:
+        tma_image_path = tma_image_path,
+        tma_annotation_path = tma_annotation_path
+    output:
+        image_path = result_path + "/{sample}/01_image.tiff"
+    script:
+        "scripts/01_crop_tma.py"
+
+rule cellpose:
+    input:
+        marker_path = marker_path,
+        image_path = result_path + "/{sample}/01_image.tiff"
+    output:
+        mask_path = result_path + "/{sample}/02_cellpose_unprocessed.tif"
+    conda: 
+        "envs/spatialproteomics_env.yaml"
+    script:
+        "scripts/02_cellpose.py"
+
+# TODO: process segmentation
+# TODO: process image
+# TODO: predict cts with astir
+# TODO: generate plots
