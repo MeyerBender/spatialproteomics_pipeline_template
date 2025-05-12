@@ -10,4 +10,6 @@ default-resources:
 set-resources:
     cellpose:
         slurm_partition: gpu-el8
-        mem_mb: 32000
+        mem_mb: 8000
+    process_segmentation:
+        mem_mb: 4000

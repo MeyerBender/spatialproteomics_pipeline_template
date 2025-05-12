@@ -10,34 +10,53 @@ result_path = config["paths"]["result_path"]   # where all intermediate files an
 # we need to define the sample names to tell snakemake which samples to process
 # these can simply be read from the TMA annotations which we previously created with QuPath
 import pandas as pd
-annotation_df = pd.read_csv(tma_annotation_path)
+annotation_df = pd.read_csv(tma_annotation_path, sep="\t")
 sample_names = annotation_df["Name"].unique().tolist()
 
 rule all:
     input:
-        expand(zarr_path + "/{sample}.zarr", sample=sample_names)
+        expand(result_path + "/{sample}/03_cellpose_processed.tiff", sample=sample_names)
 
 rule crop_tma:
     input:
         tma_image_path = tma_image_path,
-        tma_annotation_path = tma_annotation_path
+        tma_annotation_path = tma_annotation_path,
+        parameter_config_path = "configs/cropping_config.yaml",
+        cropped_image_path = result_path
     output:
-        image_path = result_path + "/{sample}/01_image.tiff"
+        overview_plot = result_path + "/cropping/overview.png",
+        individual_cores_plot = result_path + "/cropping/individual_cores.png",
+        images = expand(result_path + "/{sample}/01_image.tiff", sample=sample_names)
+    conda: 
+        "envs/spatialproteomics_env.yaml"
     script:
         "scripts/01_crop_tma.py"
 
 rule cellpose:
     input:
         marker_path = marker_path,
-        image_path = result_path + "/{sample}/01_image.tiff"
+        image_path = result_path + "/{sample}/01_image.tiff",
+        crop_done = result_path + "/cropping/individual_cores.png"  # this indicates that the cropping has finished
     output:
-        mask_path = result_path + "/{sample}/02_cellpose_unprocessed.tif"
+        mask_path = result_path + "/{sample}/02_cellpose_unprocessed.tiff",
+        plot_path = result_path + "/{sample}/02_cellpose_unprocessed_overlay.png"
     conda: 
         "envs/spatialproteomics_env.yaml"
     script:
         "scripts/02_cellpose.py"
+        
+rule process_segmentation:
+    input:
+        marker_path = marker_path,
+        image_path = result_path + "/{sample}/01_image.tiff",
+        mask_path = result_path + "/{sample}/02_cellpose_unprocessed.tiff",
+        parameter_config_path = "configs/segmentation_processing_config.yaml"
+    output:
+        mask_path = result_path + "/{sample}/03_cellpose_processed.tiff",
+        plot_path = result_path + "/{sample}/03_cellpose_unprocessed_overlay.png"
+    conda: 
+        "envs/spatialproteomics_env.yaml"
+    script:
+        "scripts/03_process_segmentation.py"
 
-# TODO: process segmentation
-# TODO: process image
-# TODO: predict cts with astir
-# TODO: generate plots
+# TODO: quantify and predict cts with astir (no image processing needed), generate plots and export zarrs

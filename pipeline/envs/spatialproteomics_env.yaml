@@ -11,4 +11,4 @@ dependencies:
   - pandas
   - yaml
   - pip:
-    - spatialproteomics[cellpose]==0.7.1
+    - spatialproteomics[cellpose,astir]==0.7.1
