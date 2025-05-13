@@ -1,8 +1,8 @@
-import tifffile 
-import spatialproteomics as sp
-import pandas as pd
-import yaml
 import matplotlib.pyplot as plt
+import pandas as pd
+import spatialproteomics as sp
+import tifffile
+import yaml
 
 image_path = snakemake.input.image_path
 marker_path = snakemake.input.marker_path
@@ -28,7 +28,9 @@ segmentation = tifffile.imread(segmentation_path)
 img = img.pp.add_segmentation(segmentation)
 
 # === filtering segmentation ===
-img = img.pp.add_observations("area").pp.filter_by_obs('area', func=lambda x: (x >= min_cell_size) & (x <= max_cell_size))
+img = img.pp.add_observations("area").pp.filter_by_obs(
+    "area", func=lambda x: (x >= min_cell_size) & (x <= max_cell_size)
+)
 
 # === growing segmentation ===
 img = img.pp.grow_cells(iterations=mask_growth)
@@ -38,9 +40,9 @@ img = img.pp.remove_outlying_cells()
 
 # === plotting ===
 plt.figure(figsize=(10, 10))
-_ = img.pp['DAPI'].pl.colorize('gold').pl.show(render_segmentation=True)
-plt.savefig(snakemake.output.plot_path, bbox_inches='tight', pad_inches=0)
+_ = img.pp["DAPI"].pl.colorize("gold").pl.show(render_segmentation=True)
+plt.savefig(snakemake.output.plot_path, bbox_inches="tight", pad_inches=0)
 
 # === exporting ===
-segmentation_processed = img['_segmentation'].values
+segmentation_processed = img["_segmentation"].values
 tifffile.imwrite(snakemake.output.mask_path, segmentation_processed)

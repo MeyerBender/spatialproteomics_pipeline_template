@@ -1,8 +1,8 @@
-import tifffile 
-import spatialproteomics as sp
-import pandas as pd
-import yaml
 import matplotlib.pyplot as plt
+import pandas as pd
+import spatialproteomics as sp
+import tifffile
+import yaml
 
 image_path = snakemake.input.image_path
 marker_path = snakemake.input.marker_path
@@ -20,7 +20,9 @@ segmentation = tifffile.imread(segmentation_path)
 img = img.pp.add_segmentation(segmentation)
 
 # === quantifying protein expression ===
-img = img.pp.add_quantification(func="intensity_mean").pp.transform_expression_matrix(method="arcsinh")
+img = img.pp.add_quantification(func="intensity_mean").pp.transform_expression_matrix(
+    method="arcsinh"
+)
 
 # === running astir ===
 with open(snakemake.input.yaml_marker_path, "r") as stream:
