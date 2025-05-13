@@ -7,3 +7,6 @@ Cropping of the TMAs requires some manual oversight. The notebook `notebooks/01_
 
 # Step 2: Running the pipeline
 The entire snakemake pipeline can be found in the `pipeline` folder. Please refer to the notebook `notebooks/02_snakemake.ipynb` for details on how to run this pipeline.
+
+# Example Data
+If you want to rerun the pipeline on the example data, download the dataset from [here](https://www.huber.embl.de/users/matthias/251113_spatialproteomics_example_data.gz). Then adjust the paths in `pipeline/config.yaml` accordingly, and run snakemake using `snakemake --profile profile`.
