@@ -2,4 +2,5 @@ paths:
     tma_image_path: "../../data/image.qptiff"
     marker_path: "../../data/MarkerList.txt"
     tma_annotation_path: "../../data/tma_annotations.txt"
+    yaml_marker_path: "../../data/marker_dict.yaml"
     result_path: "../../data/results"

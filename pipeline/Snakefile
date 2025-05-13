@@ -3,6 +3,7 @@ configfile: "config.yaml"
 tma_image_path = config["paths"]["tma_image_path"]   # where the big TMA image is stored
 marker_path = config["paths"]["marker_path"]   # where the marker list is stored
 tma_annotation_path = config["paths"]["tma_annotation_path"]   # where the annotations from QuPath are stored
+yaml_marker_path = config["paths"]["yaml_marker_path"]   # where the match between markers and cell types are stored for astir
 result_path = config["paths"]["result_path"]   # where all intermediate files and results will be stored
 
 
@@ -15,7 +16,7 @@ sample_names = annotation_df["Name"].unique().tolist()
 
 rule all:
     input:
-        expand(result_path + "/{sample}/03_cellpose_processed.tiff", sample=sample_names)
+        expand(result_path + "/{sample}/05_umap_markers.png", sample=sample_names)
 
 rule crop_tma:
     input:
@@ -58,5 +59,30 @@ rule process_segmentation:
         "envs/spatialproteomics_env.yaml"
     script:
         "scripts/03_process_segmentation.py"
+        
+rule predict_celltypes:
+    input:
+        marker_path = marker_path,
+        yaml_marker_path = yaml_marker_path,
+        image_path = result_path + "/{sample}/01_image.tiff",
+        mask_path = result_path + "/{sample}/03_cellpose_processed.tiff",
+    output:
+        zarr_path = directory(result_path + "/{sample}/04_dataset.zarr")
+    conda: 
+        "envs/spatialproteomics_env.yaml"
+    script:
+        "scripts/04_predict_celltypes.py"
 
-# TODO: quantify and predict cts with astir (no image processing needed), generate plots and export zarrs
+rule plot:
+    input:
+        yaml_marker_path = yaml_marker_path,
+        zarr_path = result_path + "/{sample}/04_dataset.zarr"
+    output:
+        plot_path_1 = result_path + "/{sample}/05_markers_and_cts.png",
+        plot_path_2 = result_path + "/{sample}/05_heatmap.png",
+        plot_path_3 = result_path + "/{sample}/05_umap_cts.png",
+        plot_path_4 = result_path + "/{sample}/05_umap_markers.png",
+    conda: 
+        "envs/spatialproteomics_env.yaml"
+    script:
+        "scripts/05_plot.py"

@@ -13,3 +13,7 @@ set-resources:
         mem_mb: 8000
     process_segmentation:
         mem_mb: 4000
+    predict_celltypes:
+        mem_mb: 4000
+    plot:
+        mem_mb: 8000

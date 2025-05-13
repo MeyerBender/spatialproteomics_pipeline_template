@@ -11,4 +11,7 @@ dependencies:
   - pandas
   - yaml
   - pip:
-    - spatialproteomics[cellpose,astir]==0.7.1
+    - git+https://github.com/camlab-bioml/astir
+    - spatialproteomics[cellpose]==0.7.1
+    - dask==2025.4.1
+    - scanpy==1.11.1
