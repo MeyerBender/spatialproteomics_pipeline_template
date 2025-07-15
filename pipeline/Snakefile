@@ -54,7 +54,7 @@ rule process_segmentation:
         parameter_config_path = "configs/segmentation_processing_config.yaml"
     output:
         mask_path = result_path + "/{sample}/03_cellpose_processed.tiff",
-        plot_path = result_path + "/{sample}/03_cellpose_unprocessed_overlay.png"
+        plot_path = result_path + "/{sample}/03_cellpose_processed_overlay.png"
     conda: 
         "envs/spatialproteomics_env.yaml"
     script:
