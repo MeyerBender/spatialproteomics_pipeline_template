@@ -28,6 +28,8 @@ img = img.pp.add_quantification(func="intensity_mean").pp.transform_expression_m
 with open(snakemake.input.yaml_marker_path, "r") as stream:
     marker_dict = yaml.safe_load(stream)
 
-img = img.tl.astir(marker_dict)
+# check for empty data
+if img.sizes["cells"] > 0:
+    img = img.tl.astir(marker_dict)
 
 img.drop_encoding().to_zarr(snakemake.output.zarr_path)
